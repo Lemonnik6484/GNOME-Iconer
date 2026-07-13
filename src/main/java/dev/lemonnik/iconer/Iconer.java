@@ -1,4 +1,4 @@
-package net.template.mod_id;
+package dev.lemonnik.iconer;
 
 //? if fabric {
 
@@ -31,12 +31,12 @@ import net.minecraft.resources.Identifier;
 //@Mod(MOD_ID)
 
 @SuppressWarnings("removal")
-public class MainClass
+public class Iconer
 		//? if fabric
 		implements ModInitializer
 
 		{
-	public static final String MOD_ID = /*$ mod_id */"mod_id";
+	public static final String MOD_ID = /*$ mod_id */"iconer";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	public static final String VERSION = /*$ mod_version */"0.1.0";

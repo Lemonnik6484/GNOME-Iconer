@@ -152,6 +152,23 @@ processResources {
     inputs.property "version", project.mod_version
     inputs.property "minecraft_dependency", project.minecraft_dependency
 
+    def valueMap = [
+            "id": project.mod_id,
+            "name": project.mod_name,
+            "version": project.mod_version,
+            "minecraft_dependency": project.minecraft_dependency,
+
+            "description": project.mod_description,
+            "authors": project.mod_authors,
+            "homepage": project.mod_homepage,
+            "sources": project.mod_sources,
+            "issue": project.mod_issue,
+            "license": project.mod_license,
+            "java": JAVA_COMPATIBILITY,
+            "java_compatibility_level": "JAVA_${javaVersion}",
+            "mixins": "${project.mod_id}.mixins.json"
+    ]
+
     def good_files = [] as Set
     def all_files = [] as Set
     [
@@ -168,22 +185,6 @@ processResources {
         def path = it2 as String
         if (good_files.contains(path)) {
             filesMatching(path) {
-                def valueMap = [
-                        "id": project.mod_id,
-                        "name": project.mod_name,
-                        "version": project.mod_version,
-                        "minecraft_dependency": project.minecraft_dependency,
-
-                        "description": project.mod_description,
-                        "authors": project.mod_authors,
-                        "homepage": project.mod_homepage,
-                        "sources": project.mod_sources,
-                        "issue": project.mod_issue,
-                        "license": project.mod_license,
-                        "java": JAVA_COMPATIBILITY,
-                        "java_compatibility_level": "JAVA_${javaVersion}",
-                        "mixins": "${project.mod_id}.mixins.json"
-                ]
                 expand valueMap
             }
         } else {
@@ -194,6 +195,22 @@ processResources {
     if (project.platform in ['forge', 'neoforge']) {
         // forge requires the mod icon file to be at the resource root
         filesMatching(MOD_ICON_PATH) { f -> f.path = new File(f.path).getName() }
+    }
+
+    doLast {
+        def mixinFile = file("${project.projectDir}/src/main/resources/${project.mod_id}.mixins.json")
+        if (!mixinFile.exists()) {
+            mixinFile = file("${rootProject.projectDir}/src/main/resources/${project.mod_id}.mixins.json")
+        }
+        if (mixinFile.exists()) {
+            copy {
+                from(mixinFile)
+                into("${project.buildDir}/resources/main")
+                expand(valueMap)
+            }
+        } else {
+            logger.warn("Mixin config not found for ${project.mod_id}, skipping forced copy")
+        }
     }
 }
 
