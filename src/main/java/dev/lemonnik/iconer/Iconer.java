@@ -81,7 +81,7 @@ public class Iconer
 						"[Desktop Entry]\n" +
 								"Type=Application\n" +
 								"Icon=" + TARGET_ICON_PATH + "\n" +
-								"StartupWMClass=Minecraft"
+								"StartupWMClass=Minecraft*"
 				);
 				LOGGER.info("Created minecraft-iconer.desktop in {}", DESKTOP_ENTRY_PATH);
 
