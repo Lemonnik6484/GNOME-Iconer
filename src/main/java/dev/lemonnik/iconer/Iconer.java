@@ -7,14 +7,12 @@ import net.fabricmc.loader.api.FabricLoader;
 
 //? if forge {
 /*import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.ModList;
-*/
-//?}
+import net.minecraftforge.fml.loading.FMLPaths;
+*///?}
 
 //? if neoforge {
 /*import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLPaths;
 *///?}
 
@@ -26,8 +24,7 @@ import java.nio.file.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//? 1.18.2
-//import net.minecraft.network.chat.TextComponent;
+import static dev.lemonnik.iconer.Iconer.MOD_ID;
 
 //? if forge || neoforge
 //@Mod(MOD_ID)
@@ -50,10 +47,10 @@ public class Iconer
 	@Override public void onInitialize()
 
 	//? if neoforge
-	 //public void MainClass(IEventBus modBus)
+	 //public Iconer(IEventBus modBus)
 
 	//? if forge
-	//public MainClass()
+	//public Iconer()
 
 	{
 		if (allGood) {
