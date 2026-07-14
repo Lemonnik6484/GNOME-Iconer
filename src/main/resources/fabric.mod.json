@@ -14,7 +14,7 @@
   },
   "license": "${license}",
   "icon": "icon.png",
-  "environment": "*",
+  "environment": "client",
   "entrypoints": {
     "main": [
       "dev.lemonnik.iconer.Iconer"

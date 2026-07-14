@@ -29,7 +29,6 @@ import static dev.lemonnik.iconer.Iconer.MOD_ID;
 //? if forge || neoforge
 //@Mod(MOD_ID)
 
-@SuppressWarnings("removal")
 public class Iconer
 		//? if fabric
 		implements ModInitializer
@@ -54,13 +53,18 @@ public class Iconer
 
 	{
 		if (allGood) {
-			LOGGER.info("Iconer started, but all work has been done earlier (̿▀̿‿ ̿▀̿ ̿)");
+			LOGGER.info("Iconer started, but all work has been done earlier! (̿▀̿‿ ̿▀̿ ̿)");
 		} else {
-			LOGGER.warn("Iconer started, but something failed and it's too late to fix it (╥﹏╥)");
+			LOGGER.warn("Iconer started! Seems like early code failed, but we can try in later! (now) (︶︹︶)");
+			if (genFiles()) {
+				LOGGER.info("It's all good now! Have fun! <(^_^)>");
+			} else {
+				LOGGER.info("It's still not working, everything is broken... (╥﹏╥)");
+			}
 		}
 	}
 
-	public static void genFiles() {
+	public static boolean genFiles() {
 		try {
 			Process process = new ProcessBuilder("gnome-shell", "--version").start();
 			String output = new String(process.getInputStream().readAllBytes());
@@ -86,12 +90,15 @@ public class Iconer
 				LOGGER.info("Created minecraft-iconer.desktop in {}", DESKTOP_ENTRY_PATH);
 
 				allGood = true;
+				return true;
 			} else {
 				LOGGER.warn("GNOME not detected");
+				return true;
 			}
 		} catch (Exception e) {
 			LOGGER.error("Failed to complete tasks");
 			e.printStackTrace();
+			return false;
 		}
 	}
 
