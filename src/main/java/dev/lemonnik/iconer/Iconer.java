@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import net.minecraft.SharedConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,15 +57,23 @@ public class Iconer
 			LOGGER.info("Iconer started, but all work has been done earlier! (̿▀̿‿ ̿▀̿ ̿)");
 		} else {
 			LOGGER.warn("Iconer started! Seems like early code failed, but we can try in later! (now) (︶︹︶)");
-			if (genFiles()) {
+			if (genFiles(false)) {
 				LOGGER.info("It's all good now! Have fun! <(^_^)>");
 			} else {
-				LOGGER.info("It's still not working, everything is broken... (╥﹏╥)");
+				LOGGER.warn("It's still not working, last try... (╥﹏╥)");
+				if (genFiles(true)) {
+					LOGGER.info("Fallback complete! Should be good now! (✿◠‿◠)");
+				} else {
+					LOGGER.warn("Fallback failed! You're on your own now. (⊙＿⊙')");
+				}
 			}
 		}
 	}
 
-	public static boolean genFiles() {
+	public static boolean genFiles(boolean fallback) {
+		if (!isCompatible() && !fallback) {
+			return false;
+		}
 		try {
 			Process process = new ProcessBuilder("gnome-shell", "--version").start();
 			String output = new String(process.getInputStream().readAllBytes());
@@ -76,18 +85,40 @@ public class Iconer
 				Files.write(TARGET_ICON_PATH, loadIconBytes());
 				LOGGER.info("Wrote minecraft.png to {}", TARGET_ICON_PATH);
 
-				if (Files.exists(DESKTOP_ENTRY_PATH)) {
-					Files.delete(DESKTOP_ENTRY_PATH);
-				}
+				if (!fallback) {
+					if (Files.exists(DESKTOP_ENTRY_PATH)) {
+						Files.delete(DESKTOP_ENTRY_PATH);
+					}
 
-				Files.createFile(DESKTOP_ENTRY_PATH);
-				Files.writeString(DESKTOP_ENTRY_PATH,
-						"[Desktop Entry]\n" +
-								"Type=Application\n" +
-								"Icon=" + TARGET_ICON_PATH + "\n" +
-								"StartupWMClass=Minecraft*"
-				);
-				LOGGER.info("Created minecraft-iconer.desktop in {}", DESKTOP_ENTRY_PATH);
+					Files.createFile(DESKTOP_ENTRY_PATH);
+					Files.writeString(DESKTOP_ENTRY_PATH,
+							"[Desktop Entry]\n" +
+									"Type=Application\n" +
+									"Icon=" + TARGET_ICON_PATH + "\n" +
+									"StartupWMClass=Minecraft*"
+					);
+					LOGGER.info("Created minecraft-iconer.desktop in {}", DESKTOP_ENTRY_PATH);
+				} else {
+					//? if >=1.21.9 {
+					String version = SharedConstants.getCurrentVersion().name();
+					//?} else {
+					/*String version = SharedConstants.getCurrentVersion().getName();
+					*///?}
+					Path desktop = Path.of(System.getProperty("user.home") + "/.local/share/applications/minecraft-iconer-" + version + ".desktop");
+
+					if (Files.exists(desktop)) {
+						Files.delete(desktop);
+					}
+
+					Files.createFile(desktop);
+					Files.writeString(desktop,
+							"[Desktop Entry]\n" +
+									"Type=Application\n" +
+									"Icon=" + TARGET_ICON_PATH + "\n" +
+									"StartupWMClass=Minecraft* " + version
+					);
+                    LOGGER.info("Created minecraft-iconer-{}.desktop in {}", version, desktop);
+				}
 
 				allGood = true;
 				return true;
@@ -119,5 +150,23 @@ public class Iconer
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to load icon resource", e);
 		}
+	}
+
+	private static boolean isCompatible() {
+		//? if fabric {
+		return true;
+		//?} else if forge {
+			/*//? if >1.19.2 {
+				return false;
+			//?} else {
+				/^return true;
+			^///?}
+		 *///?} else if neoforge {
+			/*//? if >1.21.9 {
+				/^return true;
+			^///?} else {
+				return false;
+			//?}
+		 *///?}
 	}
 }

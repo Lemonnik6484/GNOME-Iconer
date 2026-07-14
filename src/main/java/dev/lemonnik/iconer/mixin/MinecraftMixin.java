@@ -13,7 +13,7 @@ public class MinecraftMixin {
     //? if >1.20.1 {
     @Inject(method = "<init>", at = @At("HEAD"))
     private static void iconer$init(CallbackInfo ci) {
-        Iconer.genFiles();
+        Iconer.genFiles(false);
     }
     //?}
 
