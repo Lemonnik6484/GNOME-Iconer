@@ -1,29 +1,31 @@
 package dev.lemonnik.iconer;
 
 //? if fabric {
-
 import net.fabricmc.api.ModInitializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import net.fabricmc.loader.api.FabricLoader;
 //?}
+
 //? if forge {
 /*import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.fml.ModList;
 */
 //?}
+
 //? if neoforge {
 /*import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.loading.FMLLoader;
-*/
-//?}
-//? if >=1.21.11 {
-import net.minecraft.resources.Identifier;
-//?} else {
-/*import net.minecraft.resources.ResourceLocation;
- */
-//?}
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.loading.FMLPaths;
+*///?}
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 //? 1.18.2
 //import net.minecraft.network.chat.TextComponent;
 
@@ -39,32 +41,79 @@ public class Iconer
 	public static final String MOD_ID = /*$ mod_id */"iconer";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-	public static final String VERSION = /*$ mod_version */"0.1.0";
+	private static final Path TARGET_ICON_PATH = Path.of(getGameDir() + "/minecraft.png");
+	private static final Path DESKTOP_ENTRY_PATH = Path.of(System.getProperty("user.home") + "/.local/share/applications/minecraft-iconer.desktop");
+
+	private static boolean allGood = false;
 
 	//? if fabric
 	@Override public void onInitialize()
 
 	//? if neoforge
-	 //public MainClass(IEventBus modBus)
+	 //public void MainClass(IEventBus modBus)
 
 	//? if forge
 	//public MainClass()
 
 	{
-		LOGGER.info("Starting " + MOD_ID);
+		if (allGood) {
+			LOGGER.info("Iconer started, but all work has been done earlier (̿▀̿‿ ̿▀̿ ̿)");
+		} else {
+			LOGGER.warn("Iconer started, but something failed and it's too late to fix it (╥﹏╥)");
+		}
 	}
 
-	//? >=1.21.11 {
-	public static Identifier id(String namespace, String path) {
-	//?} else {
-	/*public static ResourceLocation id(String namespace, String path) {
-	*///?}
-		//? if >=1.21.11 {
-		return Identifier.tryBuild(namespace, path);
-		 //?} else if >1.18.2 {
-		/*return ResourceLocation.tryBuild(namespace, path);
-		 *///?} else {
-		/*return new ResourceLocation(namespace, path);
-		*///?}
+	public static void genFiles() {
+		try {
+			Process process = new ProcessBuilder("gnome-shell", "--version").start();
+			String output = new String(process.getInputStream().readAllBytes());
+			process.waitFor();
+
+			if (output.toUpperCase().contains("GNOME")) {
+                LOGGER.info("Detected {}", output);
+
+				Files.write(TARGET_ICON_PATH, loadIconBytes());
+				LOGGER.info("Wrote minecraft.png to {}", TARGET_ICON_PATH);
+
+				if (Files.exists(DESKTOP_ENTRY_PATH)) {
+					Files.delete(DESKTOP_ENTRY_PATH);
+				}
+
+				Files.createFile(DESKTOP_ENTRY_PATH);
+				Files.writeString(DESKTOP_ENTRY_PATH,
+						"[Desktop Entry]\n" +
+								"Type=Application\n" +
+								"Icon=" + TARGET_ICON_PATH + "\n" +
+								"StartupWMClass=Minecraft"
+				);
+				LOGGER.info("Created minecraft-iconer.desktop in {}", DESKTOP_ENTRY_PATH);
+
+				allGood = true;
+			} else {
+				LOGGER.warn("GNOME not detected");
+			}
+		} catch (Exception e) {
+			LOGGER.error("Failed to complete tasks");
+			e.printStackTrace();
+		}
+	}
+
+	private static Path getGameDir() {
+		//? if fabric {
+		return FabricLoader.getInstance().getGameDir();
+		//?} else if forge || neoforge {
+		/*return FMLPaths.GAMEDIR.get();
+		 *///?}
+	}
+
+	private static byte[] loadIconBytes() {
+		try (InputStream is = Iconer.class.getResourceAsStream("/minecraft.png")) {
+			if (is == null) {
+				throw new IllegalStateException("minecraft.png not found on classpath");
+			}
+			return is.readAllBytes();
+		} catch (IOException e) {
+			throw new RuntimeException("Failed to load icon resource", e);
+		}
 	}
 }
