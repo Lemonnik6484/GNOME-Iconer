@@ -16,8 +16,9 @@ It does that by generating `.desktop` file to set the minecraft icon for `Minecr
 | 1.20(.1)  |      ✅       |  ⭐️   |    ❌     |
 | 1.19.0-2  |      ✅       |   ✅   |    ❌     |
 |  1.18.X   |      ❌       |   ✅   |    ❌     |
+
 ✅ - Supported
 ⭐️ - Workaround
 ❌ - Not Planned
 
-⭐️Workaround versions work create a separate `.desktop` entry for each minecraft version. That's because I can't modify WM Class because of *stupid* early loading screen on newer forge and older neoforge versions :(
+⭐️Workaround versions work by creating a separate `.desktop` entry for each minecraft version. As I can't modify WM Class because of *stupid* early loading screen on newer forge and older neoforge versions :(
