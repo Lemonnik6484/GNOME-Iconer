@@ -21,4 +21,4 @@ It does that by generating `.desktop` file to set the minecraft icon for `Minecr
 ⭐️ - Workaround
 ❌ - Not Planned
 
-⭐️Workaround versions work by creating a separate `.desktop` entry for each minecraft version. As I can't modify WM Class because of *stupid* early loading screen on newer forge and older neoforge versions. Alternatively you can disable early loading screen in `config/fml.toml`
+⭐️Workaround versions work by creating a separate `.desktop` entry for each minecraft version. As I can't modify WM Class because of *stupid* early loading screen on newer forge and older neoforge versions. Alternatively you can disable early loading screen in `config/fml.toml` (`earlyWindowProvider = ""`)
